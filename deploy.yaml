@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: dev-server
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dev-server
+    spec:
+      containers:
+      - name: dev-server
+        image: bakuppus/amazonlinux-httpd:latest
+        command: [ "/bin/sh" ]
+        args: [ "-c", "while true; do sh /tmp/script/run; done" ]
+        ports:
+        - name: http-port
+          containerPort: 8080
+          protocol: TCP
+        volumeMounts:
+        - name: shellscript
+          mountPath: /tmp/script
+      volumes:
+      - name: shellscript
+        configMap:
+          name: game-config
+          items: 
+          - key: run.sh
+            path: run
